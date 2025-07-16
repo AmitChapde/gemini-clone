@@ -4,6 +4,7 @@ import { Toaster } from "react-hot-toast";
 import Dashboard from "./pages/Dashboard";
 import { Chatroom } from "./pages/Chatroom";
 import AuthPage from "./pages/AuthPage";
+import ProtectedRoute from "./components/ProtectedRoute";
 
 function App() {
   return (
@@ -12,7 +13,14 @@ function App() {
         <Toaster position="top-right" />
         <Routes>
           <Route path="/" element={<AuthPage />} />
-          <Route path="/dashboard" element={<Dashboard />} />
+          <Route
+          path="/dashboard"
+          element={
+            <ProtectedRoute>
+              <Dashboard />
+            </ProtectedRoute>
+          }
+        />
           <Route path="/chat/:chatId" element={<Chatroom />} />
         </Routes>
       </div>

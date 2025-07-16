@@ -1,90 +1,85 @@
-import { useState, useEffect, useRef, useCallback } from "react";
-import { storage } from "../utils/storage";
-import { simulateAIResponse } from "../utils/mockData";
-import { MessageSkeleton } from "../components/loadingSkeleton";
-import { generateChatroomTitle } from "../utils/title-generator";
-import toast from "react-hot-toast";
-import { Copy, Paperclip, Mic, Send } from "lucide-react";
+import { useState, useEffect, useRef, useCallback } from "react"
+import { storage } from "../utils/storage"
+import { simulateAIResponse } from "../utils/mockData"
+import { MessageSkeleton } from "../components/loadingSkeleton"
+import { generateChatroomTitle } from "../utils/title-generator"
+import toast from "react-hot-toast"
 
-export function Chatroom({ chatroomId, chatroomTitle, onBack, onTitleUpdate }) {
-  const [messages, setMessages] = useState([]);
-  const [newMessage, setNewMessage] = useState("");
-  const [isTyping, setIsTyping] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
-  const [selectedImage, setSelectedImage] = useState(null);
-  const [imagePreview, setImagePreview] = useState(null);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [titleGenerated, setTitleGenerated] = useState(false);
-  const messagesEndRef = useRef(null);
-  const textareaRef = useRef(null);
-  const fileInputRef = useRef(null);
+export function Chatroom({ userId, chatroomId, chatroomTitle, onBack, onTitleUpdate, isMobile }) {
+  const [messages, setMessages] = useState([])
+  const [newMessage, setNewMessage] = useState("")
+  const [isTyping, setIsTyping] = useState(false)
+  const [isLoading, setIsLoading] = useState(true)
+  const [selectedImage, setSelectedImage] = useState(null)
+  const [imagePreview, setImagePreview] = useState(null)
+  const [searchQuery, setSearchQuery] = useState("")
+  const [titleGenerated, setTitleGenerated] = useState(false)
+  const messagesEndRef = useRef(null)
+  const textareaRef = useRef(null)
+  const fileInputRef = useRef(null)
 
   useEffect(() => {
     const loadMessages = () => {
-      setIsLoading(true);
+      setIsLoading(true)
       setTimeout(() => {
-        const saved = storage.getMessages(chatroomId) || [];
+        const saved = storage.getMessages(userId, chatroomId) || []
         const initMsg = {
           id: `msg_${Date.now()}_1`,
-          content:
-            "Hello! I'm Gemini, a helpful AI assistant created by Google. How can I help you today?",
+          content: "Hello! I'm Gemini, a helpful AI assistant created by Google. How can I help you today?",
           sender: "ai",
           timestamp: Date.now(),
           type: "text",
-        };
-        if (saved.length === 0) {
-          setMessages([initMsg]);
-          storage.setMessages(chatroomId, [initMsg]);
-        } else {
-          setMessages(saved);
-          // Check if title has been generated
-          const userMessages = saved.filter((msg) => msg.sender === "user");
-          setTitleGenerated(
-            userMessages.length > 0 && chatroomTitle !== "New conversation"
-          );
         }
-        setIsLoading(false);
-      }, 500);
-    };
+        if (saved.length === 0) {
+          setMessages([initMsg])
+          storage.setMessages(userId, chatroomId, [initMsg])
+        } else {
+          setMessages(saved)
+          const userMessages = saved.filter((msg) => msg.sender === "user")
+          setTitleGenerated(chatroomTitle !== "New conversation")
+        }
+        setIsLoading(false)
+      }, 500)
+    }
 
-    loadMessages();
-  }, [chatroomId, chatroomTitle]);
+    loadMessages()
+  }, [userId, chatroomId, chatroomTitle])
 
   const scrollToBottom = useCallback(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, []);
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
+  }, [])
 
   useEffect(() => {
-    scrollToBottom();
-  }, [messages, scrollToBottom]);
+    scrollToBottom()
+  }, [messages, scrollToBottom])
 
   useEffect(() => {
     if (textareaRef.current) {
-      textareaRef.current.style.height = "auto";
-      textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`;
+      textareaRef.current.style.height = "auto"
+      textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`
     }
-  }, [newMessage]);
+  }, [newMessage])
 
   const handleImageSelect = (e) => {
-    const file = e.target.files?.[0];
+    const file = e.target.files?.[0]
     if (file && file.size < 5 * 1024 * 1024) {
-      setSelectedImage(file);
-      const reader = new FileReader();
-      reader.onload = (e) => setImagePreview(e.target?.result);
-      reader.readAsDataURL(file);
+      setSelectedImage(file)
+      const reader = new FileReader()
+      reader.onload = (e) => setImagePreview(e.target?.result)
+      reader.readAsDataURL(file)
     } else {
-      toast.error("Image must be under 5MB");
+      toast.error("Image must be under 5MB")
     }
-  };
+  }
 
   const removeImage = () => {
-    setSelectedImage(null);
-    setImagePreview(null);
-    if (fileInputRef.current) fileInputRef.current.value = "";
-  };
+    setSelectedImage(null)
+    setImagePreview(null)
+    if (fileInputRef.current) fileInputRef.current.value = ""
+  }
 
   const sendMessage = async () => {
-    if (!newMessage.trim() && !selectedImage) return;
+    if (!newMessage.trim() && !selectedImage) return
 
     const msg = {
       id: `msg_${Date.now()}`,
@@ -93,63 +88,59 @@ export function Chatroom({ chatroomId, chatroomTitle, onBack, onTitleUpdate }) {
       timestamp: Date.now(),
       type: selectedImage ? "image" : "text",
       imageUrl: imagePreview || undefined,
-    };
+    }
 
-    const updated = [...messages, msg];
-    setMessages(updated);
-    storage.setMessages(chatroomId, updated);
+    const updated = [...messages, msg]
+    setMessages(updated)
+    storage.setMessages(userId, chatroomId, updated)
 
     // Generate title from first user message
     if (!titleGenerated && msg.sender === "user" && msg.content.trim()) {
-      const newTitle = generateChatroomTitle(msg.content);
-      onTitleUpdate(chatroomId, newTitle);
-      setTitleGenerated(true);
+      const newTitle = generateChatroomTitle(msg.content)
+      onTitleUpdate(chatroomId, newTitle)
+      setTitleGenerated(true)
     }
 
-    setNewMessage("");
-    removeImage();
-    setIsTyping(true);
+    setNewMessage("")
+    removeImage()
+    setIsTyping(true)
 
     try {
-      const aiReply = await simulateAIResponse(msg.content);
+      const aiReply = await simulateAIResponse(msg.content)
       const aiMsg = {
         id: `msg_${Date.now()}_ai`,
         content: aiReply,
         sender: "ai",
         timestamp: Date.now(),
         type: "text",
-      };
-      const final = [...updated, aiMsg];
-      setMessages(final);
-      storage.setMessages(chatroomId, final);
+      }
+      const final = [...updated, aiMsg]
+      setMessages(final)
+      storage.setMessages(userId, chatroomId, final)
     } catch {
-      toast.error("AI response failed");
+      toast.error("AI response failed")
     } finally {
-      setIsTyping(false);
+      setIsTyping(false)
     }
-  };
+  }
 
   const copyMessage = async (content) => {
     try {
-      await navigator.clipboard.writeText(content);
-      toast.success("Copied to clipboard");
+      await navigator.clipboard.writeText(content)
+      toast.success("Copied to clipboard")
     } catch {
-      toast.error("Failed to copy");
+      toast.error("Failed to copy")
     }
-  };
+  }
 
   const handleKeyDown = (e) => {
     if (e.key === "Enter" && !e.shiftKey) {
-      e.preventDefault();
-      sendMessage();
+      e.preventDefault()
+      sendMessage()
     }
-  };
+  }
 
-  const visible = messages.filter(
-    (m) =>
-      !searchQuery ||
-      m.content.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const visible = messages.filter((m) => !searchQuery || m.content.toLowerCase().includes(searchQuery.toLowerCase()))
 
   const renderMessage = (message) => (
     <div key={message.id} className="group">
@@ -157,22 +148,13 @@ export function Chatroom({ chatroomId, chatroomTitle, onBack, onTitleUpdate }) {
         <div className="flex-shrink-0">
           {message.sender === "ai" ? (
             <div className="w-8 h-8 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 rounded-full flex items-center justify-center">
-              <svg
-                className="w-5 h-5 text-white"
-                viewBox="0 0 24 24"
-                fill="currentColor"
-              >
+              <svg className="w-5 h-5 text-white" viewBox="0 0 24 24" fill="currentColor">
                 <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
               </svg>
             </div>
           ) : (
             <div className="w-8 h-8 bg-gray-600 rounded-full flex items-center justify-center">
-              <svg
-                className="w-5 h-5 text-gray-300"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
+              <svg className="w-5 h-5 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path
                   strokeLinecap="round"
                   strokeLinejoin="round"
@@ -200,9 +182,7 @@ export function Chatroom({ chatroomId, chatroomTitle, onBack, onTitleUpdate }) {
             />
           )}
           <div className="prose prose-gray dark:prose-invert max-w-none">
-            <p className="text-gray-900 dark:text-gray-100 whitespace-pre-wrap">
-              {message.content}
-            </p>
+            <p className="text-gray-900 dark:text-gray-100 whitespace-pre-wrap">{message.content}</p>
           </div>
           <div className="flex items-center gap-2 mt-3 opacity-0 group-hover:opacity-100 transition-opacity">
             <button
@@ -228,55 +208,50 @@ export function Chatroom({ chatroomId, chatroomTitle, onBack, onTitleUpdate }) {
         </div>
       </div>
     </div>
-  );
+  )
 
   if (isLoading) {
     return (
-      <div className="flex flex-col h-full bg-white dark:bg-[#1A1A1A]">
+      <div className="flex flex-col h-full bg-white dark:bg-[#1A1A1A] overflow-hidden">
         <MessageSkeleton />
       </div>
-    );
+    )
   }
 
   return (
-    <div className="flex flex-col h-full bg-white dark:bg-[#1A1A1A]">
-      {/* Header */}
-      <div className="px-4 py-3 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center sticky top-0 bg-white dark:bg-[#1A1A1A] z-10">
-        <button
-          onClick={onBack}
-          className="text-gray-900 dark:text-white md:hidden"
-        >
-          ←
-        </button>
-        <h2 className="text-gray-900 dark:text-white font-medium truncate">
-          {chatroomTitle}
-        </h2>
-        <div className="w-6" />
-      </div>
+    <div className="flex flex-col h-full bg-white dark:bg-[#1A1A1A] overflow-hidden">
+      {/* Header - Only show back button and title on mobile when in chatroom */}
+      {isMobile && (
+        <div className="px-4 py-3 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center flex-shrink-0 bg-white dark:bg-[#1A1A1A]">
+          <button onClick={onBack} className="text-gray-900 dark:text-white">
+            ←
+          </button>
+          <h2 className="text-gray-900 dark:text-white font-medium truncate">{chatroomTitle}</h2>
+          <div className="w-6" />
+        </div>
+      )}
 
-      {/* Search */}
-      <div className="px-4 mt-2">
-        <input
-          type="text"
-          placeholder="Search messages..."
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          className="w-full bg-gray-100 dark:bg-[#2A2A2A] text-gray-900 dark:text-white p-2 rounded text-sm border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
-        />
-      </div>
+      {/* Search - Hide on mobile to save space */}
+      {!isMobile && (
+        <div className="px-4 mt-2 flex-shrink-0">
+          <input
+            type="text"
+            placeholder="Search messages..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full bg-gray-100 dark:bg-[#2A2A2A] text-gray-900 dark:text-white p-2 rounded text-sm border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+        </div>
+      )}
 
       {/* Messages */}
-      <div className="flex-1 overflow-y-auto px-4 py-4 space-y-6">
+      <div className="flex-1 overflow-y-auto px-4 py-4 space-y-6 min-h-0">
         <div className="space-y-8">
           {visible.map(renderMessage)}
           {isTyping && (
             <div className="flex gap-4">
               <div className="w-8 h-8 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 rounded-full flex items-center justify-center">
-                <svg
-                  className="w-5 h-5 text-white"
-                  viewBox="0 0 24 24"
-                  fill="currentColor"
-                >
+                <svg className="w-5 h-5 text-white" viewBox="0 0 24 24" fill="currentColor">
                   <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
                 </svg>
               </div>
@@ -292,7 +267,7 @@ export function Chatroom({ chatroomId, chatroomTitle, onBack, onTitleUpdate }) {
       </div>
 
       {/* Message Input */}
-      <div className="p-4 border-t border-gray-200 dark:border-gray-700">
+      <div className="p-4 border-t border-gray-200 dark:border-gray-700 flex-shrink-0">
         {imagePreview && (
           <div className="mb-2">
             <img
@@ -316,23 +291,12 @@ export function Chatroom({ chatroomId, chatroomTitle, onBack, onTitleUpdate }) {
               placeholder="Ask Gemini"
               className="w-full resize-none bg-gray-100 dark:bg-[#2A2A2A] text-gray-900 dark:text-white p-3 pr-12 rounded-full text-sm max-h-32 overflow-y-auto border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
-            <input
-              type="file"
-              ref={fileInputRef}
-              className="hidden"
-              accept="image/*"
-              onChange={handleImageSelect}
-            />
+            <input type="file" ref={fileInputRef} className="hidden" accept="image/*" onChange={handleImageSelect} />
             <button
               onClick={() => fileInputRef.current?.click()}
               className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-white transition-colors"
             >
-              <svg
-                className="w-5 h-5"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path
                   strokeLinecap="round"
                   strokeLinejoin="round"
@@ -345,15 +309,10 @@ export function Chatroom({ chatroomId, chatroomTitle, onBack, onTitleUpdate }) {
           <button
             onClick={sendMessage}
             disabled={!newMessage.trim() && !selectedImage}
-            className="bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 dark:disabled:bg-gray-600 disabled:cursor-not-allowed text-white p-3 rounded-full transition-colors"
+            className="bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 dark:disabled:bg-gray-600 disabled:cursor-not-allowed text-white p-3 rounded-full transition-colors flex-shrink-0"
           >
             {newMessage.trim() || selectedImage ? (
-              <svg
-                className="w-5 h-5"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path
                   strokeLinecap="round"
                   strokeLinejoin="round"
@@ -362,12 +321,7 @@ export function Chatroom({ chatroomId, chatroomTitle, onBack, onTitleUpdate }) {
                 />
               </svg>
             ) : (
-              <svg
-                className="w-5 h-5"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path
                   strokeLinecap="round"
                   strokeLinejoin="round"
@@ -380,5 +334,5 @@ export function Chatroom({ chatroomId, chatroomTitle, onBack, onTitleUpdate }) {
         </div>
       </div>
     </div>
-  );
+  )
 }

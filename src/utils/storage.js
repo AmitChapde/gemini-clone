@@ -1,41 +1,41 @@
 export const storage = {
-  getChatrooms: () => {
-    try {
-      return JSON.parse(localStorage.getItem("gemini-chatrooms") || "[]")
-    } catch {
-      return []
-    }
+  getChatrooms(userId) {
+    const key = `gemini-chatrooms_${userId}`;
+    return JSON.parse(localStorage.getItem(key) || "[]");
   },
 
-  setChatrooms: (chatrooms) => {
-    localStorage.setItem("gemini-chatrooms", JSON.stringify(chatrooms))
+  setChatrooms(userId, chatrooms) {
+    const key = `gemini-chatrooms_${userId}`;
+    localStorage.setItem(key, JSON.stringify(chatrooms));
   },
 
-  getMessages: (chatroomId) => {
-    try {
-      return JSON.parse(localStorage.getItem(`gemini-messages_${chatroomId}`) || "[]")
-    } catch {
-      return []
-    }
+  getMessages(userId, chatroomId) {
+    const key = `gemini-messages_${userId}_${chatroomId}`;
+    return JSON.parse(localStorage.getItem(key) || "[]");
   },
 
-  setMessages: (chatroomId, messages) => {
-    localStorage.setItem(`gemini-messages_${chatroomId}`, JSON.stringify(messages))
+  setMessages(userId, chatroomId, messages) {
+    const key = `gemini-messages_${userId}_${chatroomId}`;
+    localStorage.setItem(key, JSON.stringify(messages));
   },
 
-  getUserData: () => {
-    try {
-      return JSON.parse(localStorage.getItem("gemini-user") || "null")
-    } catch {
-      return null
-    }
+  getUserData() {
+    return JSON.parse(localStorage.getItem("gemini-user") || "null");
   },
 
-  setUserData: (userData) => {
-    localStorage.setItem("gemini-user", JSON.stringify(userData))
+  setUserData(user) {
+    localStorage.setItem("gemini-user", JSON.stringify(user));
   },
 
-  clearUserData: () => {
-    localStorage.removeItem("gemini-user")
+  clearUserData() {
+    localStorage.removeItem("gemini-user");
   },
-}
+
+  clearChatrooms(userId) {
+    localStorage.removeItem(`gemini-chatrooms_${userId}`);
+  },
+
+  clearMessages(userId, chatroomId) {
+    localStorage.removeItem(`gemini-messages_${userId}_${chatroomId}`);
+  },
+};

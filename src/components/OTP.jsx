@@ -5,6 +5,7 @@ import { useDispatch } from "react-redux";
 import { zodResolver } from "@hookform/resolvers/zod";
 import toast from "react-hot-toast";
 import { loginSuccess } from "../redux/authSlice";
+import { storage } from "../utils/storage";
 
 const schema = z.object({
   otp: z.string().length(6, "OTP must be exactly 6 digits"),
@@ -85,6 +86,7 @@ function OTP({ otpData, onVerifySuccess, onResendOtp, onBack }) {
           timestamp: new Date().toISOString(),
         };
         dispatch(loginSuccess(verifiedUser));
+        storage.setUserData(verifiedUser); 
         onVerifySuccess(verifiedUser);
         toast.success("OTP verified successfully!");
       } else {
