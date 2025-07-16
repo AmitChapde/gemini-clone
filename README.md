@@ -1,13 +1,137 @@
-# React + Vite
+# Gemini-Style AI Chat App
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A modern, responsive chat application inspired by conversational AI interfaces like Gemini. This app supports OTP-based authentication, multi-chatroom management, real-time messaging UI, and sleek dark/light theming using ShadCN and Tailwind CSS.
 
-Currently, two official plugins are available:
+---
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## 📁 Project Structure
 
-## Expanding the ESLint configuration
+```plaintext
+src/
+├── assets/
+├── components/
+│   ├── ui/                      # ShadCN-based UI components (Button, Dialog, etc.)
+│   ├── loadingSkeleton.jsx
+│   ├── Login.jsx
+│   ├── OTP.jsx
+│   ├── ProtectedRoute.jsx
+├── contexts/
+│   └── themeContext.jsx
+├── lib/
+│   └── utils.js
+├── pages/
+│   ├── AuthPage.jsx
+│   ├── Chatroom.jsx
+│   └── Dashboard.jsx
+├── redux/
+│   ├── authSlice.js
+│   └── store.js
+├── utils/
+│   ├── debounce.js
+│   ├── mockData.js
+│   ├── storage.js
+│   └── title-generator.js
+├── App.css
+├── App.jsx
+├── index.css
+├── main.jsx
+├── .gitignore
+├── components.json
+├── eslint.config.js
+└── icon.svg
+```
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
-# gemini-clone
+---
+
+## 🚀 Features
+
+- **OTP-based login** using phone number verification for quick, secure access.
+- **Chatroom management**: create, delete, pin chatrooms across sessions (per-user storage).
+- **Debounce** to reduce API requests and improve responsiveness.
+- **Zod + React Hook Form** based form validation for robust input handling.
+- **Dark/light mode toggle** powered by ShadCN + Tailwind.
+- **Mobile responsive sidebar** behavior with adaptive layout for desktop vs. mobile.
+- **Redux Toolkit** state management scoped per user.
+- **Toast notifications** for instant feedback using `react-hot-toast`.
+
+---
+
+## ⚙️ Installation
+
+1. **Clone the repository:**
+
+```bash
+git clone <repo-url>
+cd <repo-folder>
+```
+
+2. **Install dependencies:**
+
+```bash
+npm install
+```
+
+3. **Start the development server:**
+
+```bash
+npm run dev
+```
+
+App will be available at: [http://localhost:5173](http://localhost:5173)
+
+---
+
+## 💡 Implementation Details
+
+### 🔄 Debounce
+- Implemented in `utils/debounce.js` using custom debounce hook.
+
+### ✅ Form Validation
+- Zod schema-based validation integrated with `react-hook-form` in OTP and login flows.
+- Ensures all fields meet strict format (e.g., 6-digit OTP).
+
+### 🔐 Protected Routing
+- `ProtectedRoute.jsx` restricts routes unless `isAuthenticated` is `true` in Redux.
+- Redirects unauthorized users to Auth page.
+
+---
+
+## 🧩 Tech Stack
+
+- **React 19**
+- **Redux Toolkit**
+- **React Router DOM 7**
+- **ShadCN UI** 
+- **Tailwind CSS 4**
+- **Zod + React Hook Form**
+- **React Hot Toast**
+- **Axios**
+- **Lucide Icons**
+- **Vite** 
+
+---
+
+## 📸 Screenshots
+
+### 🟢 Login Page
+
+![Login Page](public/Screenshots/Screenshot2.png)
+
+### 🟢 Verify OTP
+
+![Verify OTP](public/Screenshots/Screenshot3.png)
+
+### 🟢 Dashboard & Chatroom Interface 
+
+![Dashboard & Chatroom Interface](public/Screenshots/Screenshot1.png)
+
+---
+
+## 🔮 Future Improvements
+
+- Add backend integration for real OTP and chat persistence.
+- Migrate to TypeScript for type safety.
+- Add Jest + React Testing Library for test coverage.
+- WebSocket-based real-time messaging.
+- Avatar/image support in messages.
+- Drag and drop file sharing.
