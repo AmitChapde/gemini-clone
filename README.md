@@ -118,15 +118,15 @@ App will be available at: [http://localhost:5173](http://localhost:5173)
 
 ### 🟢 Login Page
 
-![Login Page](public/Screenshots/Screenshot2.png)
+![Login Page](public/Screenshots/Screenshot2.PNG)
 
 ### 🟢 Verify OTP
 
-![Verify OTP](public/Screenshots/Screenshot3.png)
+![Verify OTP](public/Screenshots/Screenshot3.PNG)
 
 ### 🟢 Dashboard & Chatroom Interface
 
-![Dashboard & Chatroom Interface](public/Screenshots/Screenshot1.png)
+![Dashboard & Chatroom Interface](public/Screenshots/Screenshot1.PNG)
 
 ---
 
