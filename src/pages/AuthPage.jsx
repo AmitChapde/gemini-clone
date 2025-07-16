@@ -28,7 +28,6 @@ function AuthPage() {
       message: `New OTP sent to ${otpData.phoneData.countryCode} ${otpData.phoneData.phoneNumber}. Use: ${newOtp}`,
     });
 
-    console.log("New OTP:", newOtp); 
   };
 
   const handleBackToLogin = () => {

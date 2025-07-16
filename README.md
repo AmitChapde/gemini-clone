@@ -47,7 +47,7 @@ src/
 
 - **OTP-based login** using phone number verification for quick, secure access.
 - **Chatroom management**: create, delete, pin chatrooms across sessions (per-user storage).
-- **Debounce** to reduce API requests and improve responsiveness.
+- **Debounce** Optimized search with debounce to delay processing until user input stabilizes, reducing request load.
 - **Zod + React Hook Form** based form validation for robust input handling.
 - **Dark/light mode toggle** powered by ShadCN + Tailwind.
 - **Mobile responsive sidebar** behavior with adaptive layout for desktop vs. mobile.
@@ -84,13 +84,16 @@ App will be available at: [http://localhost:5173](http://localhost:5173)
 ## 💡 Implementation Details
 
 ### 🔄 Debounce
+
 - Implemented in `utils/debounce.js` using custom debounce hook.
 
 ### ✅ Form Validation
+
 - Zod schema-based validation integrated with `react-hook-form` in OTP and login flows.
 - Ensures all fields meet strict format (e.g., 6-digit OTP).
 
 ### 🔐 Protected Routing
+
 - `ProtectedRoute.jsx` restricts routes unless `isAuthenticated` is `true` in Redux.
 - Redirects unauthorized users to Auth page.
 
@@ -101,13 +104,13 @@ App will be available at: [http://localhost:5173](http://localhost:5173)
 - **React 19**
 - **Redux Toolkit**
 - **React Router DOM 7**
-- **ShadCN UI** 
+- **ShadCN UI**
 - **Tailwind CSS 4**
 - **Zod + React Hook Form**
 - **React Hot Toast**
 - **Axios**
 - **Lucide Icons**
-- **Vite** 
+- **Vite**
 
 ---
 
@@ -121,7 +124,7 @@ App will be available at: [http://localhost:5173](http://localhost:5173)
 
 ![Verify OTP](public/Screenshots/Screenshot3.png)
 
-### 🟢 Dashboard & Chatroom Interface 
+### 🟢 Dashboard & Chatroom Interface
 
 ![Dashboard & Chatroom Interface](public/Screenshots/Screenshot1.png)
 
