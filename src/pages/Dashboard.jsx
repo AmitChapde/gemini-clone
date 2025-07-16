@@ -161,7 +161,6 @@ function DashboardContent() {
 
   // Logout function
   const handleLogout = () => {
-    storage.clearUserData()
     dispatch(logout())
     navigate("/")
   }
